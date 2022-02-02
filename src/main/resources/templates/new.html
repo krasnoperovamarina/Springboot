@@ -10,6 +10,8 @@
       th:object="${user}" method="post">
     Name:
     <input type="text" th:field="*{name}"/>
+    Password:
+    <input type="text" th:field="*{password}"/>
     <br/>
     <input type="submit" value="Create" />
 </form>

@@ -1,51 +1,56 @@
 package com.example.spring_boot.service;
-
-import com.example.spring_boot.dao.UserRepository;
+import com.example.spring_boot.dao.UserDao;
 import com.example.spring_boot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
-@Service
+@Component
 public class UserServiceImpl implements UserService{
 
+    final UserDao userDao;
+
+    PasswordEncoder passwordEncoder;
+
     @Autowired
-    UserRepository userRepository;
+    public UserServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder) {
+        this.userDao = userDao;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userDao.getAllUsers();
     }
 
     @Override
     public User getUser(int id) {
-        return userRepository.getById(id);
+        return userDao.getUser(id);
     }
 
     @Override
     public void save(User user) {
-        userRepository.save(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDao.save(user);
     }
 
     @Override
     public void update(int id, User updatedUser) {
-        User userDB = userRepository.findById(id).get();
-        if(Objects.nonNull(updatedUser.getUsername())) {
-            userDB.setName(updatedUser.getName());
-        }
-        userRepository.save(updatedUser);
+        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        userDao.update(id, updatedUser);
     }
 
     @Override
     public void delete(int id) {
-        userRepository.deleteById(id);
+        userDao.delete(id);
     }
 
     @Override
     public User getUserByName(String name) {
-       return userRepository.findByName(name);
+       return userDao.getUserByName(name);
     }
-
 }
